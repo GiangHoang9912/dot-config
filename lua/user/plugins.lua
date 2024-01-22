@@ -43,9 +43,6 @@ return packer.startup(function(use)
     }
     use 'lervag/vimtex'
 
-    -- null-ls
-    use "jose-elias-alvarez/null-ls.nvim"
-
     use {
         "wbthomason/packer.nvim",
         commit = "6afb67460283f0e990d35d229fd38fdc04063e0a"
@@ -159,10 +156,30 @@ return packer.startup(function(use)
         "neovim/nvim-lspconfig",
         commit = "f11fdff7e8b5b415e5ef1837bdcdd37ea6764dda",
         config = function()
-			require("user.lsp.handlers")
+            require("user.lsp.handlers")
             require("custom.configs.lspconfig")
+            local ok, err = pcall(function()
+                require'lspconfig'.tsserver.setup {}
+            end)
+            if not ok then
+                -- print("Failed to setup tsserver: " .. err) -- Comment out this line to suppress the error message
+            end
         end
     } -- enable LSP
+
+    use {
+        'hrsh7th/nvim-compe',
+        config = function()
+            require'compe'.setup {
+                source = {
+                    path = true,
+                    buffer = true,
+                    nvim_lsp = true
+                }
+            }
+        end
+    }
+
     use {
         "williamboman/mason.nvim",
         commit = "c2002d7a6b5a72ba02388548cfaf420b864fbc12",
@@ -219,11 +236,6 @@ return packer.startup(function(use)
         init = function()
             vim.g.rustfmt_autosave = 1
         end
-    }
-
-    use {
-        "simrat39/rust-tools.nvim",
-        ft = "rust"
     }
 
     -- plugins for rust language
